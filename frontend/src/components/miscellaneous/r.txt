@@ -1,0 +1,17 @@
+if (!selectedChat) {
+			console.log("Selected chat is undefined or not set");
+			return; // Exit early if no chat is selected
+		}
+
+		if (!selectedChat.groupAdmin) {
+			console.log("Group admin is undefined in the selected chat");
+			return; // Exit if no group admin data is available
+		}
+
+		console.log("Selected chat object:", selectedChat);
+
+		// If both selectedChat and selectedChat.groupAdmin are defined
+		console.log("Group admin ID:", selectedChat.groupAdmin);
+
+
+		above will check selectedChat is fetch or not

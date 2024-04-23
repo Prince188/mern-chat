@@ -1,0 +1,39 @@
+/* Heading font family imported */
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+.App {
+	min-height: 100vh;
+	display: flex;
+	background-image: url(./background.png);
+	background-size: contain;
+	background-position: center;
+}
+
+::-webkit-scrollbar {
+	width: 0px;
+}
+
+.chatbox {
+	background-color: red;
+	/* height: 80vh; */
+}
+
+* {
+	font-family: 'work sans';
+	font-weight: 600;
+}
+
+.heading {
+	font-family: "lobster" !important;
+}
+
+.notinum {
+	background-color: 'red';
+	display: flex;
+	border-radius: '50%';
+	transform: 'translateX(-15px) translateY(-3px)';
+	color: 'white';
+	font-size: 12;
+}

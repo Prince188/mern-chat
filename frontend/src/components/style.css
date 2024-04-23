@@ -1,0 +1,8 @@
+.messages{
+	/* height: 658.71px; */
+	/* background-color: red; */
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+	scrollbar-width: "10px";
+}
