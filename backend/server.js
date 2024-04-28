@@ -53,13 +53,14 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
-    // credentials: true,
+    origin: ["http://localhost:3000", "https://mern-chat-2-ewhs.onrender.com"], // Allow both local development and production
+    credentials: true, // Allows cookies to be sent with requests if required
   },
 });
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
+
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
@@ -67,7 +68,7 @@ io.on("connection", (socket) => {
 
   socket.on("join chat", (room) => {
     socket.join(room);
-    console.log("User Joined Room: " + room);
+    console.log(`User Joined Room: ${room}`);
   });
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
