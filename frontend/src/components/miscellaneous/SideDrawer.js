@@ -179,7 +179,7 @@ function SideDrawer() {
                 size="xs"
                 cursor="pointer"
                 name={user.name}
-                src={user.pic}
+                // src={user.pic}
               />
             </MenuButton>
             <div style={{ zIndex: 1, transform: 'translateY(-40px)' }}>
