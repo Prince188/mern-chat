@@ -53,7 +53,7 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: ["http://localhost:3000", "https://mern-chat-2-ewhs.onrender.com"], // Allow both local development and production
+    origin: "http://localhost:3000", // Allow both local development and production
     credentials: true, // Allows cookies to be sent with requests if required
   },
 });
