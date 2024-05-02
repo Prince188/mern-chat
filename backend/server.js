@@ -1,11 +1,12 @@
 const express = require("express");
 const connectDB = require("./config/db");
-const path = require("path");
 const dotenv = require("dotenv");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const path = require("path");
+const Message = require('./models/messageModel');
 
 dotenv.config();
 connectDB();
@@ -43,7 +44,7 @@ if (process.env.NODE_ENV === "production") {
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 const server = app.listen(
   PORT,
@@ -53,14 +54,13 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://mern-chat-2-ewhs.onrender.com",
-    credentials: true, 
+    origin: "http://localhost:3000",
+    // credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
-
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
 
   socket.on("join chat", (room) => {
     socket.join(room);
-    console.log(`User Joined Room: ${room}`);
+    console.log("User Joined Room: " + room);
   });
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
@@ -83,6 +83,29 @@ io.on("connection", (socket) => {
 
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
+  });
+
+  socket.on("message-read", async ({ messageId, userId }) => {
+    
+    try {
+      console.log("Handling 'message-read'", messageId)
+      const updatedMessage = await Message.findByIdAndUpdate(
+        messageId,
+        {
+          read: true, // Setting read status to true
+          // $addToSet: { readBy: userId }, 
+        },
+        { new: true } // Return the updated document
+      );
+
+      // Broadcast the update to other users in the same chat
+      if (updatedMessage) {
+        // const chatId = updatedMessage.chat._id;
+        socket.to(updatedMessage.chat._id).emit("message-read-update", updatedMessage);
+      }
+    } catch (error) {
+      console.error("Error handling message-read:", error);
+    }
   });
 
   socket.off("setup", () => {
