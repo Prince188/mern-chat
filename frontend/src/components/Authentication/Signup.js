@@ -5,6 +5,7 @@ import { VStack } from "@chakra-ui/layout";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useState } from "react";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { useHistory } from "react-router";
 
 const Signup = () => {
@@ -156,7 +157,7 @@ const Signup = () => {
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+            {show ? <IoEyeOffOutline /> : <IoEyeOutline />}
             </Button>
           </InputRightElement>
         </InputGroup>
@@ -171,7 +172,7 @@ const Signup = () => {
           />
           <InputRightElement width="4.5rem">
             <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+            {show ? <IoEyeOffOutline /> : <IoEyeOutline />}
             </Button>
           </InputRightElement>
         </InputGroup>

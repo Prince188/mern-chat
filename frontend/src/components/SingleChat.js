@@ -2,7 +2,7 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import { Button, IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -11,11 +11,14 @@ import ProfileModal from "./miscellaneous/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
 import Lottie from "react-lottie";
 import animationData from "../animations/typing.json";
+import { InputRightElement, InputLeftElement, InputGroup } from "@chakra-ui/react"
 
 import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "Production website instead of localhost"; -> After deployment
+import { IoSend, IoSendOutline } from "react-icons/io5";
+import { FaRegSmile, FaSmile } from "react-icons/fa";
+const ENDPOINT = "http://localhost:5000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -55,6 +58,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         config
       );
       setMessages(data);
+
+      data.forEach((message) => {
+        if (!message.read) {
+          console.log("Emitting 'message-read'", message._id)
+          socket.emit("message-read", { messageId: message._id, userId: user._id });
+        }
+      });
+
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
@@ -103,11 +114,43 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }
   };
+  const sendMessageBtn = async (event) => {
+    socket.emit("stop typing", selectedChat._id);
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      setNewMessage("");
+      const { data } = await axios.post(
+        "/api/message",
+        {
+          content: newMessage,
+          chatId: selectedChat,
+        },
+        config
+      );
+      socket.emit("new message", data);
+      setMessages([...messages, data]);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to send the Message",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
 
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
+    socket.on("connected", () => console.log("Client connected to Socket.io"));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
 
@@ -136,6 +179,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     });
   });
+
+  useEffect(() => {
+    socket.on("message-read-update", (updatedMessage) => {
+      // Update messages state with the updated message
+      setMessages((prevMessages) =>
+        prevMessages.map((m) =>
+          m._id === updatedMessage._id ? updatedMessage : m
+        )
+      );
+    });
+  
+    // Cleanup to avoid memory leaks
+    return () => {
+      socket.off("message-read-update"); // Cleanup event listener
+    };
+  }, [socket]); 
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -173,7 +232,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             alignItems="center"
           >
             <IconButton
-              d={{ base: "flex", md: "none" }}
+              
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat("")}
             />
@@ -197,12 +256,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ))}
           </Text>
           <Box
-          className='chatbox'
             d="flex"
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            
+            bg="#E8E8E8"
             w="100%"
             h="100%"
             borderRadius="lg"
@@ -223,7 +281,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             )}
 
             <FormControl
-            autoFill={false}
               onKeyDown={sendMessage}
               id="first-name"
               isRequired
@@ -241,15 +298,30 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ) : (
                 <></>
               )}
-              <Input
-              className='msginput'
-                borderColor = "black"
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Enter a message.."
-                value={newMessage}
-                onChange={typingHandler}
-              />
+
+              {/* //? input field */}
+
+              <InputGroup display='flex'>
+                <InputLeftElement>
+                  <Button _focus='none' borderRadius='50%' h="2rem" p={1} size="sm" bg='black' color='white' _hover='none'>
+                    <FaRegSmile />
+                  </Button>
+                </InputLeftElement>
+                <Input
+                borderColor = 'black'
+                  variant="filled"
+                  bg="#E0E0E0"
+                  px={3}
+                  placeholder="Enter a message.."
+                  value={newMessage}
+                  onChange={typingHandler}
+                />
+                <InputRightElement>
+                  <Button _focus='none' borderRadius='50%' w='1.5rem' h="2rem" p={1} onClick={sendMessageBtn} size="sm" bg='black' color='white' _hover='none'>
+                    <IoSendOutline />
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
             </FormControl>
           </Box>
         </>

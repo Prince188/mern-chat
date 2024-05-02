@@ -13,6 +13,8 @@ import {
   Text,
   Image,
 } from "@chakra-ui/react";
+import { CgProfile } from "react-icons/cg";
+import { FaEye, FaRegEye } from "react-icons/fa";
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -22,9 +24,9 @@ const ProfileModal = ({ user, children }) => {
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
-        <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+        <IconButton d={{ base: "flex" }} bg='black' color='white' icon={<CgProfile /> } _hover='none' _focus='none' onClick={onOpen} />
       )}
-      <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
+      <Modal size="sm" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent h="410px">
           <ModalHeader
@@ -56,10 +58,7 @@ const ProfileModal = ({ user, children }) => {
             </Text>
           </ModalBody>
           <ModalFooter>
-          <Button style={{backgroundColor : 'black' , color : 'white'}} mr={3} onClick={onClose}>
-              Close
-            </Button>
-            
+            <Button bg='black' color='white' w={'98%'} mx={'auto'} onClick={onClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

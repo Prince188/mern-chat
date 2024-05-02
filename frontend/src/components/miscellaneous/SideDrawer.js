@@ -31,6 +31,8 @@ import { Effect } from "react-notification-badge";
 import { getSender } from "../../config/ChatLogics";
 import UserListItem from "../userAvatar/UserListItem";
 import { ChatState } from "../../Context/ChatProvider";
+import { FaRegBell } from "react-icons/fa";
+import {IconButton} from "@chakra-ui/react"
 
 function SideDrawer() {
   const [search, setSearch] = useState("");
@@ -141,17 +143,18 @@ function SideDrawer() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="3xl" className='appName' fontFamily="Work sans">
+        <Text fontSize="2xl" fontFamily="Work sans">
           Text-o-gram
         </Text>
-        <div>
+        <div style={{display : 'flex'}}>
           <Menu>
             <MenuButton p={1}>
               <NotificationBadge
                 count={notification.length}
                 effect={Effect.SCALE}
               />
-              <BellIcon fontSize="2xl" m={1} />
+              {/* <BellIcon fontSize="2xl" m={1} /> */}
+              <FaRegBell fontSize={'xl'} mt={2} size={20} />
             </MenuButton>
             <MenuList pl={2}>
               {!notification.length && "No New Messages"}
@@ -170,27 +173,18 @@ function SideDrawer() {
               ))}
             </MenuList>
           </Menu>
-
-          <Menu style={{ zIndex: 2 }} >
-
-            <MenuButton as={Button} p={2} size={{ base: 'sm' }} rightIcon={<ChevronDownIcon />}>
-
+          <Menu>
+            <MenuButton as={Button} bg = 'white' rightIcon={<ChevronDownIcon />}>
               <Avatar
                 size="xs"
                 cursor="pointer"
                 name={user.name}
-                // src={user.pic}
+                src={user.pic}
               />
             </MenuButton>
-            <div style={{ zIndex: 1, transform: 'translateY(-40px)' }}>
-              <NotificationBadge
-                count={notification.length}
-                effect={Effect.SCALE}
-              />
-            </div>
             <MenuList>
               <ProfileModal user={user}>
-                <MenuItem>My Profile</MenuItem>{" "}
+                <MenuItem>My Profile</MenuItem>
               </ProfileModal>
               <MenuDivider />
               <MenuItem onClick={logoutHandler}>Logout</MenuItem>
@@ -220,6 +214,7 @@ function SideDrawer() {
                 <UserListItem
                   key={user._id}
                   user={user}
+                  // src={user.pic}
                   handleFunction={() => accessChat(user._id)}
                 />
               ))

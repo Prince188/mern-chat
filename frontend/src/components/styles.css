@@ -1,32 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&display=swap');
-
 .messages {
   display: flex;
   flex-direction: column;
   overflow-y: scroll;
   scrollbar-width: none;
-}
-
-.chatbox {
-  /* background-image: url(); */
-  background-size: cover;
-  background-color: #d6d6d6;
-  opacity: 0.8;
-  background-position: center;
-}
-
-.mychat {
-  /* background-image: url(../mychatbg.jpeg); */
-  /* background-color: #d6d6d6; */
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-}
-
-.appName {
-  text-align: center;
-  font-family: "Dancing Script", cursive !important;
-  font-optical-sizing: auto;
-  font-weight:bolder;
-  font-style: italic;
 }

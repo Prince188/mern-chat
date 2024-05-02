@@ -7,6 +7,8 @@ import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 import { useHistory } from "react-router-dom";
 import { ChatState } from "../../Context/ChatProvider";
+import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
+import { IoMdLogIn } from "react-icons/io";
 
 const Login = () => {
   const [show, setShow] = useState(false);
@@ -75,6 +77,7 @@ const Login = () => {
       <FormControl id="email" isRequired>
         <FormLabel>Email Address</FormLabel>
         <Input
+          borderColor='black'
           value={email}
           type="email"
           placeholder="Enter Your Email Address"
@@ -85,37 +88,28 @@ const Login = () => {
         <FormLabel>Password</FormLabel>
         <InputGroup size="md">
           <Input
+          borderColor='black'
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type={show ? "text" : "password"}
             placeholder="Enter password"
           />
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClick}>
-              {show ? "Hide" : "Show"}
+            <Button h="1.75rem" size="sm" onClick={handleClick} bg='black' color='white' _hover='none'>
+              {show ? <IoEyeOffOutline /> : <IoEyeOutline />}
             </Button>
           </InputRightElement>
         </InputGroup>
       </FormControl>
       <Button
-        colorScheme="blue"
+        bg='black'
+        color='white'
         width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={loading}
       >
-        Login
-      </Button>
-      <Button
-        variant="solid"
-        colorScheme="red"
-        width="100%"
-        onClick={() => {
-          setEmail("guest@example.com");
-          setPassword("123456");
-        }}
-      >
-        Get Guest User Credentials
+        Login &nbsp;&nbsp; <IoMdLogIn />
       </Button>
     </VStack>
   );

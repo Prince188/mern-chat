@@ -1,4 +1,4 @@
-import { ViewIcon } from "@chakra-ui/icons";
+import { ArrowRightIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -21,6 +21,9 @@ import { useState } from "react";
 import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
+import { BiExit } from "react-icons/bi";
+import { FaRegEye } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -113,6 +116,8 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       return;
     }
 
+    // Feature that allow only admin can remove members
+
     if (selectedChat.groupAdmin._id !== user._id) {
       toast({
         title: "Only admins can add someone!",
@@ -158,6 +163,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   };
 
   const handleRemove = async (user1) => {
+
+    // Feature that allow only admin can remove members
+
     if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
       toast({
         title: "Only admins can remove someone!",
@@ -205,9 +213,9 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   return (
     <>
-      <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+      <IconButton d={{ base: "flex" }} icon={<CgProfile />} onClick={onOpen} bg='black' color='white' _hover='none' _focus='none' />
 
-      <Modal onClose={onClose} isOpen={isOpen} isCentered>
+      <Modal size='sm' onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader
@@ -233,6 +241,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             </Box>
             <FormControl d="flex">
               <Input
+              borderColor = 'black'
                 placeholder="Chat Name"
                 mb={3}
                 value={groupChatName}
@@ -240,16 +249,20 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
               />
               <Button
                 variant="solid"
-                colorScheme="teal"
+                bg='black'
+                color='white'
                 ml={1}
                 isLoading={renameloading}
                 onClick={handleRename}
+                _hover = 'none'
+                _focus="none"
               >
                 Update
               </Button>
             </FormControl>
             <FormControl>
               <Input
+              borderColor = 'black'
                 placeholder="Add User to group"
                 mb={1}
                 onChange={(e) => handleSearch(e.target.value)}
@@ -264,13 +277,14 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                   key={user._id}
                   user={user}
                   handleFunction={() => handleAddUser(user)}
+                  // admin={admin}
                 />
               ))
             )}
           </ModalBody>
           <ModalFooter>
             <Button onClick={() => handleRemove(user)} colorScheme="red">
-              Leave Group
+              Leave Group &nbsp;&nbsp; <BiExit />
             </Button>
           </ModalFooter>
         </ModalContent>
