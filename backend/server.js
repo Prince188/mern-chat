@@ -55,12 +55,14 @@ const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "https://mern-chat-2-ewhs.onrender.com",
-    // credentials: true,
+    // origin: "http://localhost:3000",
+    credentials: true,
   },
 });
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
+
   socket.on("setup", (userData) => {
     socket.join(userData._id);
     socket.emit("connected");
@@ -70,11 +72,12 @@ io.on("connection", (socket) => {
     socket.join(room);
     console.log("User Joined Room: " + room);
   });
-  socket.on("typing", (room) => socket.in(room).emit("typing"));
-  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+  socket.on("typing", (room) => {socket.in(room).emit("typing")});
+  socket.on("stop typing", (room) => {socket.in(room).emit("stop typing")});
 
   socket.on("new message", (newMessageRecieved) => {
-    var chat = newMessageRecieved.chat;
+    const chat = newMessageRecieved.chat;
 
     if (!chat.users) return console.log("chat.users not defined");
 
@@ -86,26 +89,26 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message-read", async ({ messageId, userId }) => {
-    
     try {
       console.log("Handling 'message-read'", messageId)
       const updatedMessage = await Message.findByIdAndUpdate(
         messageId,
         {
           read: true, // Setting read status to true
-          // $addToSet: { readBy: userId }, 
+          $addToSet: { readBy: userId },
         },
         { new: true } // Return the updated document
       );
 
       // Broadcast the update to other users in the same chat
       if (updatedMessage) {
-        // const chatId = updatedMessage.chat._id;
+        console.log("Emitting 'message-read-update'", updatedMessage);
         socket.to(updatedMessage.chat._id).emit("message-read-update", updatedMessage);
       }
     } catch (error) {
-      console.error("Error handling message-read:", error);
+      console.error("Error handling 'message-read':", error);
     }
+
   });
 
   socket.off("setup", () => {
