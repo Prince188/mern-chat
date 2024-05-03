@@ -1,4 +1,3 @@
-import { ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -14,7 +13,6 @@ import {
   Image,
 } from "@chakra-ui/react";
 import { CgProfile } from "react-icons/cg";
-import { FaEye, FaRegEye } from "react-icons/fa";
 
 const ProfileModal = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();

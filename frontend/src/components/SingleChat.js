@@ -16,10 +16,11 @@ import { InputRightElement, InputLeftElement, InputGroup } from "@chakra-ui/reac
 import io from "socket.io-client";
 import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
-import { IoSend, IoSendOutline } from "react-icons/io5";
-import { FaRegSmile, FaSmile } from "react-icons/fa";
+import { IoSendOutline } from "react-icons/io5";
+import { FaRegSmile } from "react-icons/fa";
 const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
-var socket, selectedChatCompare;
+// const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages, setMessages] = useState([]);
@@ -154,6 +155,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
 
+
+    return () => {
+      socket.disconnect();
+    };
     // eslint-disable-next-line
   }, []);
 
@@ -172,13 +177,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       ) {
         if (!notification.includes(newMessageRecieved)) {
           setNotification([newMessageRecieved, ...notification]);
-          setFetchAgain(!fetchAgain);
+          // setFetchAgain(!fetchAgain);
         }
       } else {
-        setMessages([...messages, newMessageRecieved]);
+        setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
       }
     });
-  });
+
+    return () => {
+      socket.off("message recieved");
+    };
+  },[]);
 
   useEffect(() => {
     socket.on("message-read-update", (updatedMessage) => {
@@ -189,12 +198,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         )
       );
     });
-  
-    // Cleanup to avoid memory leaks
+
+    // Cleanup to avoid memory leaks F
     return () => {
       socket.off("message-read-update"); // Cleanup event listener
     };
-  }, [socket]); 
+  }, []);
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -232,7 +241,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             alignItems="center"
           >
             <IconButton
-              
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat("")}
             />
@@ -308,7 +316,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   </Button>
                 </InputLeftElement>
                 <Input
-                borderColor = 'black'
+                  borderRadius='30'
+                  borderColor='black'
                   variant="filled"
                   bg="#E0E0E0"
                   px={3}

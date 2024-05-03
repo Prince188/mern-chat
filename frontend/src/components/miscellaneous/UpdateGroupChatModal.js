@@ -1,4 +1,3 @@
-import { ArrowRightIcon, ViewIcon } from "@chakra-ui/icons";
 import {
   Modal,
   ModalOverlay,
@@ -22,7 +21,6 @@ import { ChatState } from "../../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
 import { BiExit } from "react-icons/bi";
-import { FaRegEye } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
