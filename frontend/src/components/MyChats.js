@@ -8,6 +8,9 @@ import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "../Context/ChatProvider";
+import SingleChat from "./SingleChat";
+import SideDrawer from './/miscellaneous/SideDrawer'
+import SearchSection from "./miscellaneous/SearchSection";
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
@@ -56,6 +59,7 @@ const MyChats = ({ fetchAgain }) => {
       borderRadius="lg"
       borderWidth="1px"
     >
+      
       <Box
         pb={3}
         px={3}
@@ -77,6 +81,9 @@ const MyChats = ({ fetchAgain }) => {
           </Button>
         </GroupChatModal>
       </Box>
+      {/* <Box>
+        <SearchSection />
+      </Box> */}
       <Box
         style={{marginTop : 0}}
         d="flex"

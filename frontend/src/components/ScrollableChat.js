@@ -10,7 +10,7 @@ import {
 import { ChatState } from "../Context/ChatProvider";
 
 const ScrollableChat = ({ messages }) => {
-  const { user } = ChatState();
+  const { user, selectedChat } = ChatState();
 
 
   return (
@@ -60,6 +60,9 @@ const ScrollableChat = ({ messages }) => {
                   // marginBottom: lastReadMessage ? '12px' : "0px"
                 }}
               >
+                <div style={{ fontSize: '0.8rem', marginRight: 'auto', fontWeight: 'bold', color: 'blue' }}>
+                  {selectedChat.isGroupChat ? (m.sender._id === user._id ? "" : m.sender.name) : ""}
+                </div>
                 <div style={{ marginRight: m.sender._id === user._id ? 15 : 0 }}>
                   {m.content}
                 </div>
@@ -69,7 +72,7 @@ const ScrollableChat = ({ messages }) => {
                     style={{
                       // height : 'fit-content' ,
                       marginLeft: 'auto',
-                      marginBottom : "-12px",
+                      marginBottom: "-12px",
                       transform: 'translate(8px , -8px)',
                       // display : 'flex',
                       alignItems: 'center',

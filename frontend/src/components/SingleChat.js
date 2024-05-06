@@ -2,7 +2,7 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { Button, IconButton, Spinner, useToast } from "@chakra-ui/react";
+import { Avatar, Button, IconButton, Spinner, Tooltip, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -18,8 +18,8 @@ import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 import { IoSendOutline } from "react-icons/io5";
 import { FaRegSmile } from "react-icons/fa";
-const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
-// const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+// const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -43,6 +43,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     ChatState();
 
   const fetchMessages = async () => {
+
     if (!selectedChat) return;
 
     try {
@@ -63,7 +64,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       data.forEach((message) => {
         if (!message.read) {
           console.log("Emitting 'message-read'", message._id)
-          socket.emit("message-read", { messageId: message._id, userId: user._id });
+          const messageId = message._id;
+          const userId = user._id;
+          const senderId = message.sender._id;
+          socket.emit("message-read", { messageId, userId, senderId }); // 
         }
       });
 
@@ -115,6 +119,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       }
     }
   };
+
   const sendMessageBtn = async (event) => {
     socket.emit("stop typing", selectedChat._id);
     try {
@@ -147,6 +152,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
@@ -162,12 +168,24 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     // eslint-disable-next-line
   }, []);
 
+
   useEffect(() => {
     fetchMessages();
 
     selectedChatCompare = selectedChat;
     // eslint-disable-next-line
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message-read-update", (updatedMessage) => {
+      console.log("Received 'message-read-update'", updatedMessage); // Confirm event received
+      setMessages((prevMessages) =>
+        prevMessages.map((m) =>
+          m._id === updatedMessage._id ? updatedMessage : m
+        )
+      );
+    });
+  }, [socket]);
 
   useEffect(() => {
     socket.on("message recieved", (newMessageRecieved) => {
@@ -177,7 +195,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       ) {
         if (!notification.includes(newMessageRecieved)) {
           setNotification([newMessageRecieved, ...notification]);
-          // setFetchAgain(!fetchAgain);
+          setFetchAgain(fetchAgain);
         }
       } else {
         setMessages((prevMessages) => [...prevMessages, newMessageRecieved]);
@@ -187,23 +205,35 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     return () => {
       socket.off("message recieved");
     };
-  },[]);
-
-  useEffect(() => {
-    socket.on("message-read-update", (updatedMessage) => {
-      // Update messages state with the updated message
-      setMessages((prevMessages) =>
-        prevMessages.map((m) =>
-          m._id === updatedMessage._id ? updatedMessage : m
-        )
-      );
-    });
-
-    // Cleanup to avoid memory leaks F
-    return () => {
-      socket.off("message-read-update"); // Cleanup event listener
-    };
   }, []);
+
+
+
+  // useEffect(() => {
+  //   const lastMessageIsFromOtherUser = messages.length && messages[messages.length - 1].sender !== user._id
+  //   if (lastMessageIsFromOtherUser) {
+  //     socket.emit('markMessageAsSeen', {
+  //       conversationId: selectedChat._id,
+  //       userId: selectedChat.userId,
+  //     })
+  //   }
+  //   socket.on("messageSeen", ({ conversationId }) => {
+  //     if (selectedChat._id === conversationId) {
+  //       setMessages(prev => {
+  //         const updatedMessage = prev.map(message => {
+  //           if (!message.read) {
+  //             return {
+  //               ...message,
+  //               read: true
+  //             }
+  //           }
+  //           return message
+  //         })
+  //         return updatedMessage
+  //       })
+  //     }
+  //   })
+  // } , [socket , user._id , messages ,selectedChat ])
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
@@ -226,6 +256,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }, timerLength);
   };
 
+  // const userDetails = getSender(user, selectedChat.users); // Get full user info
+  // const userName = getSender(user, selectedChat.user); // Get user name
+  // const userFullName = userDetails.name; // Full name to derive initials
+  // const userProfilePic = userDetails.profilePic; // Get profile picture URL
+
   return (
     <>
       {selectedChat ? (
@@ -247,14 +282,39 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             {messages &&
               (!selectedChat.isGroupChat ? (
                 <>
-                  {getSender(user, selectedChat.users)}
+                  <div style={{ marginRight: 'auto', marginLeft: 15 }}>
+                    <Tooltip label={getSender(user, selectedChat.users)} placement="bottom-start" hasArrow>
+                      <Avatar
+                        border='1px solid black'
+                        mt="6px"
+                        mr={2}
+                        size="sm"
+                        cursor="pointer"
+                        src={getSenderFull(user, selectedChat.users).pic}
+                      // name={messages.sender.name}
+                      />
+                    </Tooltip>
+                    {getSender(user, selectedChat.users)}
+                  </div>
                   <ProfileModal
+                    size={'lg'}
                     user={getSenderFull(user, selectedChat.users)}
                   />
                 </>
               ) : (
                 <>
-                  {selectedChat.chatName.toUpperCase()}
+                  <div style={{ marginRight: 'auto', marginLeft: 15 }}>
+                    <Avatar
+                      border='1px solid black'
+                      mt="6px"
+                      mr={2}
+                      size="sm"
+                      cursor="pointer"
+                      src={'https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg'}
+                    // name={messages.sender.name}
+                    />
+                    {selectedChat.chatName.toUpperCase()}
+                  </div>
                   <UpdateGroupChatModal
                     fetchMessages={fetchMessages}
                     fetchAgain={fetchAgain}
@@ -316,18 +376,19 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                   </Button>
                 </InputLeftElement>
                 <Input
-                  borderRadius='30'
+                  borderRadius='20'
                   borderColor='black'
                   variant="filled"
                   bg="#E0E0E0"
                   px={3}
+                  height={10}
                   placeholder="Enter a message.."
                   value={newMessage}
                   onChange={typingHandler}
                 />
                 <InputRightElement>
-                  <Button _focus='none' borderRadius='50%' w='1.5rem' h="2rem" p={1} onClick={sendMessageBtn} size="sm" bg='black' color='white' _hover='none'>
-                    <IoSendOutline />
+                  <Button _focus='none' borderRadius='50%' p={1} onClick={sendMessageBtn} size="sm" bg='black' color='white' _hover='none'>
+                    <IoSendOutline style={{ margin: 5 }} />
                   </Button>
                 </InputRightElement>
               </InputGroup>
@@ -341,7 +402,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Click on a user to start chatting
           </Text>
         </Box>
-      )}
+      )
+      }
     </>
   );
 };

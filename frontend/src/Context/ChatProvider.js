@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import io from "socket.io-client"; // Correct import for socket.io-client
+
 
 const ChatContext = createContext();
 
@@ -8,6 +10,7 @@ const ChatProvider = ({ children }) => {
   const [user, setUser] = useState();
   const [notification, setNotification] = useState([]);
   const [chats, setChats] = useState();
+  const [socket, setSocket] = useState(null);
 
   const history = useHistory();
 
@@ -18,6 +21,15 @@ const ChatProvider = ({ children }) => {
     if (!userInfo) history.push("/");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [history]);
+
+  useEffect(() => {
+    const newSocket = io("http://localhost:3000"); // Update with your server endpoint
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect(); // Cleanup to avoid memory leaks
+    };
+  }, []); // Initialize socket on component mount
 
   return (
     <ChatContext.Provider
@@ -30,6 +42,8 @@ const ChatProvider = ({ children }) => {
         setNotification,
         chats,
         setChats,
+        socket,
+        setSocket,
       }}
     >
       {children}

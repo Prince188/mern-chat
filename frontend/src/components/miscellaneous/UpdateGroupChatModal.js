@@ -14,6 +14,8 @@ import {
   Box,
   IconButton,
   Spinner,
+  Avatar,
+  Text,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
@@ -34,21 +36,23 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   const { selectedChat, setSelectedChat, user } = ChatState();
 
-  const handleSearch = async (query) => {
-    setSearch(query);
-    if (!query) {
+  const handleSearch = async (search) => {
+    if (!search) {
+
       return;
     }
 
     try {
       setLoading(true);
+
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       };
+
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-      console.log(data);
+
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -60,7 +64,6 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         isClosable: true,
         position: "bottom-left",
       });
-      setLoading(false);
     }
   };
 
@@ -209,6 +212,8 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
     setGroupChatName("");
   };
 
+  // const isAdmin = String(admin._id) === String(user._id);
+
   return (
     <>
       <IconButton d={{ base: "flex" }} icon={<CgProfile />} onClick={onOpen} bg='black' color='white' _hover='none' _focus='none' />
@@ -220,26 +225,30 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             fontSize="35px"
             fontFamily="Work sans"
             d="flex"
+            // flexDir = 'column'
             justifyContent="center"
           >
-            {selectedChat.chatName}
+            {selectedChat.chatName.toUpperCase()}
           </ModalHeader>
+          <Text fontSize={20} m='auto' mt={'-5'} >Admin : {selectedChat.groupAdmin._id === user._id ? "You" : selectedChat.groupAdmin.name } </Text>
 
           <ModalCloseButton />
           <ModalBody d="flex" flexDir="column" alignItems="center">
-            <Box w="100%" d="flex" flexWrap="wrap" pb={3}>
+            <Box w="100%" d="flex" flexWrap="wrap" pb={3} >
               {selectedChat.users.map((u) => (
-                <UserBadgeItem
-                  key={u._id}
-                  user={u}
-                  admin={selectedChat.groupAdmin}
-                  handleFunction={() => handleRemove(u)}
-                />
+                <div>
+                  <UserBadgeItem
+                    key={u._id}
+                    user={u}
+                    admin={selectedChat.groupAdmin}
+                    handleFunction={() => handleRemove(u)}
+                  />
+                </div>
               ))}
             </Box>
             <FormControl d="flex">
               <Input
-              borderColor = 'black'
+                borderColor='black'
                 placeholder="Chat Name"
                 mb={3}
                 value={groupChatName}
@@ -252,7 +261,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
                 ml={1}
                 isLoading={renameloading}
                 onClick={handleRename}
-                _hover = 'none'
+                _hover='none'
                 _focus="none"
               >
                 Update
@@ -260,25 +269,27 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             </FormControl>
             <FormControl>
               <Input
-              borderColor = 'black'
+                borderColor='black'
                 placeholder="Add User to group"
-                mb={1}
+                mb={0}
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
 
-            {loading ? (
-              <Spinner size="lg" />
-            ) : (
-              searchResult?.map((user) => (
-                <UserListItem
-                  key={user._id}
-                  user={user}
-                  handleFunction={() => handleAddUser(user)}
+            <Box maxHeight={230} w={'100%'} overflowY='scroll' py={2}>
+              {loading ? (
+                <Spinner size="lg" />
+              ) : (
+                searchResult?.map((user) => (
+                  <UserListItem
+                    key={user._id}
+                    user={user}
+                    handleFunction={() => handleAddUser(user)}
                   // admin={admin}
-                />
-              ))
-            )}
+                  />
+                ))
+              )}
+            </Box>
           </ModalBody>
           <ModalFooter>
             <Button onClick={() => handleRemove(user)} colorScheme="red">
