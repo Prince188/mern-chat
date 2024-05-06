@@ -4,8 +4,6 @@ import { Avatar } from "@chakra-ui/react";
 
 const UserBadgeItem = ({ user, handleFunction, admin }) => {
 
-  const isAdmin = String(admin._id) === String(user._id);
-
 
   return (
     <Badge

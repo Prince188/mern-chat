@@ -2,7 +2,7 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./styles.css";
-import { Avatar, Button, IconButton, Spinner, Tooltip, useToast } from "@chakra-ui/react";
+import { Avatar, Button, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, Tooltip, useDisclosure, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -30,6 +30,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
   const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
 
   const defaultOptions = {
     loop: true,
@@ -291,6 +293,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                         size="sm"
                         cursor="pointer"
                         src={getSenderFull(user, selectedChat.users).pic}
+                        onClick={onOpen}
                       // name={messages.sender.name}
                       />
                     </Tooltip>
@@ -311,6 +314,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                       size="sm"
                       cursor="pointer"
                       src={'https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg'}
+                      onClick={onOpen}
                     // name={messages.sender.name}
                     />
                     {selectedChat.chatName.toUpperCase()}
@@ -404,8 +408,64 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         </Box>
       )
       }
+
+      <Modal isOpen={isOpen} onClose={onClose} size='sm' >
+        <ModalOverlay bg='blackAlpha.800'
+      backdropFilter='blur(10px) hue-rotate(0deg)'
+/>
+        <ModalContent >
+          {selectedChat ? (
+            <ModalHeader >
+              <Text ml='auto' textAlign='center' fontSize='24'>{selectedChat.isGroupChat ? selectedChat.chatName.toUpperCase() : getSender(user, selectedChat.users)}</Text>
+            </ModalHeader>
+          ) : (
+            <ModalHeader>Error: Chat not found</ModalHeader>
+          )}
+          {/* <ModalCloseButton color='white'/> */}
+            {selectedChat ?
+              (<ModalBody  display= 'flex'>
+                {!selectedChat.isGroupChat ?
+                  (<Avatar
+                    border='1px solid black'
+                    borderRadius='50%'
+                    mt="6px"
+                    m='auto'
+                    // size="3xl"
+                    height={350}
+                    width={350}
+                    cursor="pointer"
+                    src={getSenderFull(user, selectedChat.users).pic}
+                    onClick={onOpen}
+                  // name={messages.sender.name}
+                  />) :
+                  (
+                    <Avatar
+                      border='1px solid black'
+                      mt="6px"
+                      m='auto'
+                      // size="3xl"
+                      height={350}
+                      width={350}
+                      cursor="pointer"
+                      src={'https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg'}
+                      onClick={onOpen}
+                    // name={messages.sender.name}
+                    />
+                  )}
+              </ModalBody>) : (<ModalBody>Error : chat not found </ModalBody>)
+            }
+          <ModalFooter >
+            <Button colorScheme='blue' mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
+
   );
+
+
 };
 
 export default SingleChat;
