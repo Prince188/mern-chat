@@ -54,17 +54,19 @@ const server = app.listen(
 const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://mern-chat-2-ewhs.onrender.com",
-    // origin: "http://localhost:3000",
+    // origin: "https://mern-chat-2-ewhs.onrender.com",
+    origin: "http://localhost:3000",
     credentials: true,
   },
 });
+
 
 io.on("connection", (socket) => {
   console.log("Connected to socket.io");
 
   socket.on("setup", (userData) => {
     socket.join(userData._id);
+    console.log(userData._id);
     socket.emit("connected");
   });
 
@@ -73,8 +75,8 @@ io.on("connection", (socket) => {
     console.log("User Joined Room: " + room);
   });
 
-  socket.on("typing", (room) => {socket.in(room).emit("typing")});
-  socket.on("stop typing", (room) => {socket.in(room).emit("stop typing")});
+  socket.on("typing", (room) => { socket.in(room).emit("typing") });
+  socket.on("stop typing", (room) => { socket.in(room).emit("stop typing") });
 
   socket.on("new message", (newMessageRecieved) => {
     const chat = newMessageRecieved.chat;
@@ -88,28 +90,46 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("message-read", async ({ messageId, userId }) => {
+
+  socket.on("message-read", async ({ messageId, userId, senderId }) => {
+    console.log("Received 'message-read' event:", { messageId, userId });
+    if (userId === senderId) {
+
+      console.log("Sender cannot mark their own message as read");
+      return; // Exit early to avoid adding the sender's ID
+    }
+
     try {
-      console.log("Handling 'message-read'", messageId)
       const updatedMessage = await Message.findByIdAndUpdate(
         messageId,
         {
-          read: true, // Setting read status to true
-          $addToSet: { readBy: userId },
+          $addToSet: { readBy: userId }, // Ensures unique user IDs in `readBy`
+          read: true, // Set `read` to `true` when someone other than the sender reads it
         },
-        { new: true } // Return the updated document
+        { new: true }
       );
 
-      // Broadcast the update to other users in the same chat
       if (updatedMessage) {
         console.log("Emitting 'message-read-update'", updatedMessage);
         socket.to(updatedMessage.chat._id).emit("message-read-update", updatedMessage);
+      } else {
+        console.error("Update failed or incorrect `readBy` data");
       }
     } catch (error) {
       console.error("Error handling 'message-read':", error);
     }
-
   });
+
+
+  // socket.on('markMessageAsSeen', async({conversationId, userId}) =>{
+  //   try {
+  //     await Message.updateMany({conversationId : conversationId, read : false},{$set: {read : true}})
+  //     socket.to(userSocketMap[userId]).emit("messageSeen",{conversationId})
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // })
+
 
   socket.off("setup", () => {
     console.log("USER DISCONNECTED");
