@@ -18,8 +18,8 @@ import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 import { IoSendOutline } from "react-icons/io5";
 import { FaRegSmile } from "react-icons/fa";
-const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
-// const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; 
+// const ENDPOINT = "http://localhost:3000"; 
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -409,17 +409,17 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       )
       }
 
-      <Modal isOpen={isOpen} onClose={onClose} size='sm' >
+      <Modal isOpen={isOpen} onClose={onClose} size='sm' isCentered>
         <ModalOverlay bg='blackAlpha.800'
           backdropFilter='blur(10px) hue-rotate(0deg)' />
-        <ModalContent >
-          {selectedChat ? (
+        <ModalContent bg='transperant' boxShadow='none'>
+          {/* {selectedChat ? (
             <ModalHeader >
               <Text ml='auto' textAlign='center' fontSize='24'>{selectedChat.isGroupChat ? selectedChat.chatName.toUpperCase() : getSender(user, selectedChat.users)}</Text>
             </ModalHeader>
           ) : (
             <ModalHeader>Error: Chat not found</ModalHeader>
-          )}
+          )} */}
           {/* <ModalCloseButton color='white'/> */}
           {selectedChat ?
             (<ModalBody display='flex'>
@@ -453,11 +453,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 )}
             </ModalBody>) : (<ModalBody>Error : chat not found </ModalBody>)
           }
-          <ModalFooter >
+          {/* <ModalFooter >
             <Button colorScheme='blue' mr={3} onClick={onClose}>
               Close
             </Button>
-          </ModalFooter>
+          </ModalFooter> */}
         </ModalContent>
       </Modal>
     </>
