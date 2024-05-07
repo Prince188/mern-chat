@@ -26,7 +26,7 @@ const ProfileModal = ({ user, children }) => {
       )}
       <Modal size="sm" onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
-        <ModalContent h="410px">
+        <ModalContent>
           <ModalHeader
             fontSize="40px"
             fontFamily="Work sans"
@@ -45,7 +45,8 @@ const ProfileModal = ({ user, children }) => {
           >
             <Image
               borderRadius="full"
-              boxSize="100px"
+              boxSize="280px"
+              margin='auto'
               src={user.pic}
               alt={user.name}
             />
@@ -57,7 +58,7 @@ const ProfileModal = ({ user, children }) => {
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button bg='black' color='white' w={'98%'} mx={'auto'} onClick={onClose}>Close</Button>
+            <Button bg='black' color='white' w={'98%'} mx={'auto'} _hover='none' onClick={onClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

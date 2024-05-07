@@ -18,8 +18,8 @@ import UpdateGroupChatModal from "./miscellaneous/UpdateGroupChatModal";
 import { ChatState } from "../Context/ChatProvider";
 import { IoSendOutline } from "react-icons/io5";
 import { FaRegSmile } from "react-icons/fa";
-// const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
-const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+const ENDPOINT = "https://mern-chat-2-ewhs.onrender.com"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
+// const ENDPOINT = "http://localhost:3000"; // "https://talk-a-tive.herokuapp.com"; -> After deployment
 let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
@@ -411,8 +411,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
       <Modal isOpen={isOpen} onClose={onClose} size='sm' >
         <ModalOverlay bg='blackAlpha.800'
-      backdropFilter='blur(10px) hue-rotate(0deg)'
-/>
+          backdropFilter='blur(10px) hue-rotate(0deg)' />
         <ModalContent >
           {selectedChat ? (
             <ModalHeader >
@@ -422,38 +421,38 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             <ModalHeader>Error: Chat not found</ModalHeader>
           )}
           {/* <ModalCloseButton color='white'/> */}
-            {selectedChat ?
-              (<ModalBody  display= 'flex'>
-                {!selectedChat.isGroupChat ?
-                  (<Avatar
+          {selectedChat ?
+            (<ModalBody display='flex'>
+              {!selectedChat.isGroupChat ?
+                (<Avatar
+                  border='1px solid black'
+                  borderRadius='50%'
+                  mt="6px"
+                  m='auto'
+                  // size="3xl"
+                  height={350}
+                  width={350}
+                  cursor="pointer"
+                  src={getSenderFull(user, selectedChat.users).pic}
+                  onClick={onOpen}
+                // name={messages.sender.name}
+                />) :
+                (
+                  <Avatar
                     border='1px solid black'
-                    borderRadius='50%'
                     mt="6px"
                     m='auto'
                     // size="3xl"
                     height={350}
                     width={350}
                     cursor="pointer"
-                    src={getSenderFull(user, selectedChat.users).pic}
+                    src={'https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg'}
                     onClick={onOpen}
                   // name={messages.sender.name}
-                  />) :
-                  (
-                    <Avatar
-                      border='1px solid black'
-                      mt="6px"
-                      m='auto'
-                      // size="3xl"
-                      height={350}
-                      width={350}
-                      cursor="pointer"
-                      src={'https://t4.ftcdn.net/jpg/03/78/40/51/360_F_378405187_PyVLw51NVo3KltNlhUOpKfULdkUOUn7j.jpg'}
-                      onClick={onOpen}
-                    // name={messages.sender.name}
-                    />
-                  )}
-              </ModalBody>) : (<ModalBody>Error : chat not found </ModalBody>)
-            }
+                  />
+                )}
+            </ModalBody>) : (<ModalBody>Error : chat not found </ModalBody>)
+          }
           <ModalFooter >
             <Button colorScheme='blue' mr={3} onClick={onClose}>
               Close

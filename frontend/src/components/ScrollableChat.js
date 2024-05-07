@@ -1,4 +1,6 @@
 import { Avatar } from "@chakra-ui/avatar";
+import axios from "axios";
+import { IconButton } from "@chakra-ui/button";
 import { Tooltip } from "@chakra-ui/tooltip";
 import ScrollableFeed from "react-scrollable-feed";
 import {
@@ -8,10 +10,16 @@ import {
   isSameUser,
 } from "../config/ChatLogics";
 import { ChatState } from "../Context/ChatProvider";
+import { FaTrash } from "react-icons/fa";
+
 
 const ScrollableChat = ({ messages }) => {
+
+
   const { user, selectedChat } = ChatState();
 
+
+  
 
   return (
     <ScrollableFeed forceScroll={true}>
@@ -65,7 +73,9 @@ const ScrollableChat = ({ messages }) => {
                 </div>
                 <div style={{ marginRight: m.sender._id === user._id ? 15 : 0 }}>
                   {m.content}
+                  {console.log(m._id)}
                 </div>
+                
                 {/* //* lastReadMessage && m._id === lastReadMessage._id // ? will do if want indicator only for last and disable below one line */}
                 {m.read && m.sender._id === user._id && (
                   <div
